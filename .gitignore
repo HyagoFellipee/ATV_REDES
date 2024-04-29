@@ -127,6 +127,8 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+.ATV_REDES
+.ATV_REDES/
 
 # Spyder project settings
 .spyderproject
