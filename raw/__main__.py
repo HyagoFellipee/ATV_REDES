@@ -5,6 +5,7 @@ import socket
 
 if __name__ == "__main__":
 
+    # IP do HOST
     MEU_IP = socket.gethostbyname(socket.gethostname())
     IP_SERVIDOR = "15.228.191.109"
 
