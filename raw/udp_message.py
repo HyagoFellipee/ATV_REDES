@@ -67,20 +67,3 @@ class UdpMessage:
 
         return UdpMessage(is_response, request_type, identifier, message_length, message)
 
-    def __str__(self):
-        '''
-        Formata a mensagem para exibição
-        '''
-
-        message = ""
-
-        # Header como hexadecimal
-        for byte in self.as_bytes()[0:4]:
-            message += str(hex(byte)) + " "
-
-        # Mensagem como caracteres
-        for byte in self.message:
-            message += chr(byte)        
-
-            
-        return message

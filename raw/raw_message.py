@@ -90,66 +90,6 @@ class RawMessage:
         return packet
     
 
-    def from_bytes(bytes_message):
-        '''
-        Converte bytes para uma mensagem
-        bytes_message: bytes da mensagem
-        '''
-
-        # IMPORTANTE: Como o servidor utilizado para
-        # receber as mensagens é um servidor UDP, 
-        # e não um RAW, não é preciso tratar o header IP e UDP
-
-        # struct.unpack converte os bytes em valores dado um formato e uma lista de bytes
-        # ! indica que a ordem dos bytes é big-endian, que é o formato de rede mais comum
-        # B indica que é um unsigned char (1 byte)
-        # H indica que é um unsigned short (2 bytes)
-
-        is_response_and_request_type, identifier, message_length = struct.unpack('!BHB', bytes_message[:4])
-
-        is_response = is_response_and_request_type >> 4 # shift para pegar os 4 bits mais significativos
-        request_type = is_response_and_request_type & 0b00001111 # mascara para pegar os 4 bits menos significativos
-
-
-        # Se a mensagem existe, verifica se é um número ou uma string pela request_type
-        # Se for um número, converte para string
-        # Se for uma string, decodifica para UTF-8
-
-        if message_length:
-            if request_type == 2:
-                message = str(int.from_bytes(bytes_message[4:], byteorder='big'))
-            else:
-                message = bytes_message[4:].decode()
-        else: 
-            message = ""
-
-        return RawMessage(is_response, request_type, identifier, message_length, message)
-
-    def __str__(self):
-        '''
-        Formata a mensagem para exibição, apenas para facilitar a visualização
-        '''
-
-        message = ""
-        
-        ip_header_len = self.ip_header.header_length * 4
-        udp_header_len = self.udp_header.length
-        data_header_len = 4
-
-        total_header_len = ip_header_len + udp_header_len + data_header_len + self.message_length
-
-        # Header como hexadecimal
-        for byte in self.as_bytes()[0:total_header_len]:
-            message += str(hex(byte)) + " "
-
-        # Mensagem como caracteres
-        for byte in self.message:
-            message += chr(byte)        
-
-            
-        return message
-    
-
 
 class UdpHeader: 
     def __init__(
