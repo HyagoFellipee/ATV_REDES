@@ -1,7 +1,10 @@
 import socket, random
 from udp_message import UdpMessage 
 
-LOCALHOST = "127.0.0.1"
+
+MEU_IP = socket.gethostbyname(socket.gethostname())
+IP_SERVIDOR = "15.228.191.109"
+
 PORTA_CLIENTE = 8000
 PORTA_SERVIDOR = 50000
 
@@ -34,7 +37,7 @@ class UdpClient:
 
 
             # Cria a mensagem
-            message = UdpMessage(1, request_type, identifier)
+            message = UdpMessage(0, request_type, identifier)
 
             print("\nMensagem criada: ", message)
 
@@ -43,28 +46,29 @@ class UdpClient:
 
             print("Aguardando resposta...")
 
-            print("Servidor criado para receber resposta: ", self.host, self.port)
 
-            self.receive_udp_message(self.host, self.port)
+            self.receive_udp_message()
 
             # Recebe a resposta
 
-    def receive_udp_message(self, host, port):
+    def receive_udp_message(self):
 
         client_socket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
 
-        client_socket.bind((host, port))
+        client_socket.bind((self.host, self.port))
 
         try: 
-
+            
+            print("Servidor criado para receber resposta: ", self.host, self.port)
             message, _ = client_socket.recvfrom(4096)
+
 
             received_response = UdpMessage.from_bytes(message)
 
 
-            received_is_request = int(received_response.is_request, 2)
+            received_is_response = int(received_response.is_response, 2)
 
-            if received_is_request:
+            if not received_is_response:
                 raise Exception("Mensagem não é uma resposta")
             
             received_request_type = int(received_response.request_type, 2)
@@ -73,7 +77,7 @@ class UdpClient:
                 raise Exception("Request foi julgado inválido pelo servidor")
 
             
-
+    
             message = received_response.message.decode()
 
             print("\nResposta recebida: ", message)
@@ -83,27 +87,24 @@ class UdpClient:
             
 
     def send_udp_message(self, message, host, port):
+     
+        # Create a UDP socket
+        client_socket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
 
-        # Cria um socket UDP
-        self.client_socket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
-        self.client_socket.bind((self.host, self.port))
-
-        # Tenta enviar a mensagem
-        try:
-            self.client_socket.sendto(message, (host, port))
-            print("\nMensagem enviada com sucesso")
-        except Exception as e:
-            print("\nErro ao enviar mensagem: ", e)
-        finally:
-            self.client_socket.close()
+        client_socket.bind((self.host, self.port))
+        
+        # Attempt to send the message
+        client_socket.sendto(message, (host, port))
+        client_socket.close()
+    
 
 
 
     
 if __name__ == "__main__":
 
-    client = UdpClient(LOCALHOST, PORTA_CLIENTE)
-    client.start_client(LOCALHOST, PORTA_SERVIDOR)
+    client = UdpClient(MEU_IP, PORTA_CLIENTE)
+    client.start_client(IP_SERVIDOR, PORTA_SERVIDOR)
 
 
  

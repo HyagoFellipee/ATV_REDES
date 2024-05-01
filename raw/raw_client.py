@@ -1,7 +1,9 @@
 import socket, random
 from raw_message import RawMessage 
 
-LOCALHOST = "127.0.0.1"
+MEU_IP = socket.gethostbyname(socket.gethostname())
+IP_SERVIDOR = "15.228.191.109"
+
 PORTA_CLIENTE = 8000
 PORTA_SERVIDOR = 50000
 
@@ -34,7 +36,7 @@ class RawClient:
 
 
             # Cria a mensagem
-            message = RawMessage(1, request_type, identifier)
+            message = RawMessage(0, request_type, identifier)
 
             print("\nMensagem criada: ", message)
 
@@ -45,26 +47,26 @@ class RawClient:
 
             print("Servidor criado para receber resposta: ", self.host, self.port)
 
-            self.receive_raw_message(self.host, self.port)
+            self.receive_raw_message()
 
             # Recebe a resposta
 
-    def receive_raw_message(self, host, port):
+    def receive_raw_message(self):
 
         client_socket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
 
-        client_socket.bind((host, port))
+        client_socket.bind((self.host, self.port))
 
         try: 
-
+            print("Servidor criado para receber resposta: ", self.host, self.port)
             message, _ = client_socket.recvfrom(4096)
 
             received_response = RawMessage.from_bytes(message)
 
 
-            received_is_request = int(received_response.is_request, 2)
+            received_is_response = int(received_response.is_response, 2)
 
-            if received_is_request:
+            if not received_is_response:
                 raise Exception("Mensagem não é uma resposta")
             
             received_request_type = int(received_response.request_type, 2)
@@ -80,30 +82,31 @@ class RawClient:
 
         except Exception as e:
             print("\nErro ao receber resposta: ", e)
+
+        
             
 
     def send_raw_message(self, message, dest_host, dest_port):
 
         # Cria um socket RAW
-        self.client_raw_socket = socket.socket(family=socket.AF_INET, type=socket.SOCK_RAW, proto=socket.IPPROTO_RAW)
-        self.client_raw_socket.bind((self.host, self.port))
+        client_raw_socket = socket.socket(family=socket.AF_INET, type=socket.SOCK_RAW, proto=socket.IPPROTO_RAW)
+        client_raw_socket.bind((self.host, self.port))
 
         message.set_udp_header(self.port, dest_port, checksum=0)
         message.set_ip_header(self.host, dest_host)
 
       
-        self.client_raw_socket.sendto(message.as_bytes(), (dest_host, dest_port))
+        client_raw_socket.sendto(message.as_bytes(), (dest_host, dest_port))
     
-        self.client_raw_socket.close()
+        client_raw_socket.close()
 
 
 
     
 if __name__ == "__main__":
 
-    client = RawClient(LOCALHOST, PORTA_CLIENTE)
-    client.start_client(LOCALHOST, PORTA_SERVIDOR)
-
+    client = RawClient(MEU_IP, PORTA_CLIENTE)
+    client.start_client(IP_SERVIDOR, PORTA_SERVIDOR)
 
  
 
