@@ -3,7 +3,15 @@ import struct
 
 class UdpMessage: 
     def __init__(self, is_response, request_type, identifier, message_length=0, message=""):
-        
+        '''
+        Inicializa a mensagem UDP
+        is_response: indica se é uma resposta
+        request_type: tipo da requisição
+        identifier: identificador da mensagem
+        message_length: tamanho da mensagem
+        message: mensagem
+        '''
+
         self.is_response    = is_response       # 4 bits
         self.request_type   = request_type      # 4 bits 
         self.identifier     = identifier        # 16 bits
@@ -12,6 +20,9 @@ class UdpMessage:
 
         
     def as_bytes(self):
+        '''
+        Converte a mensagem em bytes
+        '''
 
         # struct.pack converte os valores em bytes dado um formato e uma lista de valores
         # ! indica que a ordem dos bytes é big-endian, que é o formato de rede mais comum
@@ -25,6 +36,10 @@ class UdpMessage:
         return header + self.message
     
     def from_bytes(bytes_message):
+        '''
+        Converte bytes para uma mensagem
+        bytes_message: bytes da mensagem
+        '''
 
         # struct.unpack converte os bytes em valores dado um formato e uma lista de bytes
         # ! indica que a ordem dos bytes é big-endian, que é o formato de rede mais comum
@@ -53,8 +68,9 @@ class UdpMessage:
         return UdpMessage(is_response, request_type, identifier, message_length, message)
 
     def __str__(self):
-
-        # Formata a mensagem para exibição, apenas para facilitar a visualização
+        '''
+        Formata a mensagem para exibição
+        '''
 
         message = ""
 
