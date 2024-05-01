@@ -49,9 +49,6 @@ class RawClient:
             message.set_ip_header(self.host, host_server)
             
 
-            print("\nMensagem criada: ", message)
-
-
             # Envia a mensagem como bytes
             self.send_raw_message(message.as_bytes(), host_server, port_server)
 

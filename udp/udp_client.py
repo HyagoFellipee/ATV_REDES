@@ -42,8 +42,6 @@ class UdpClient:
             # Cria a mensagem
             message = UdpMessage(0, request_type, identifier)
 
-            print("\nMensagem criada: ", message)
-
             # Envia a mensagem como bytes
             self.send_udp_message(message.as_bytes(), host_server, port_server)
 
