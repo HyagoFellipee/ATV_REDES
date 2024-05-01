@@ -14,7 +14,6 @@ class RawClient:
 
 
     def start_client(self, host_server, port_server):
-        
         while True:
         # Menu de opções
 
@@ -103,10 +102,7 @@ class RawClient:
 
 
     
-if __name__ == "__main__":
 
-    client = RawClient(MEU_IP, PORTA_CLIENTE)
-    client.start_client(IP_SERVIDOR, PORTA_SERVIDOR)
 
  
 
