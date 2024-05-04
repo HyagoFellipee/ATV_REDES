@@ -38,15 +38,19 @@ class RawClient:
                 break
 
             # O identificador é um número aleatório de 1 a 65535 que mudará a cada request
-            identifier = random.randint(1, 65535)
+            identifier = 23777
 
             # Cria a mensagem
             message = RawMessage(0, request_type, identifier)
 
 
             # Adiciona o header IP e UDP
-            message.set_udp_header(self.port, port_server, checksum=0)
+            message.set_udp_header(self.port, port_server, checksum=0)            
             message.set_ip_header(self.host, host_server)
+
+
+            message.udp_header.checksum = message.udp_header.calculate_checksum(self.host, host_server, message.as_bytes()[28:])
+
             
 
             # Envia a mensagem como bytes
@@ -72,12 +76,17 @@ class RawClient:
 
         # Associa o socket ao endereço e porta do cliente
         client_socket.bind((self.host, self.port))
+
+        # seta um timeout para o socket
+        client_socket.settimeout(5)
             
         # Cria um buffer para receber a mensagem
         message, _ = client_socket.recvfrom(4096)
 
         # Converte a mensagem recebida em um objeto UdpMessage
         received_response = UdpMessage.from_bytes(message)
+
+
 
 
         received_is_response = int(received_response.is_response)

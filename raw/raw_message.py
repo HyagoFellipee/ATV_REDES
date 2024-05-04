@@ -122,6 +122,59 @@ class UdpHeader:
         # H indica que é um unsigned short (2 bytes)
 
         return struct.pack("!HHHH", self.orig_port, self.dest_port, self.length, self.checksum)
+    
+    def calculate_checksum(self, source_address, dest_address, data):
+        '''
+        Calcula o checksum do header UDP
+        source_address: endereço de origem
+        dest_address: endereço de destino
+        data: dados do segmento
+        '''
+
+        # s tem que ser do tipo byte, e está como uma string representando um endereço IP
+        # Para cada número do endereço IP, converte para inteiro e depois para byte
+        source_address = bytes(map(int, source_address.split('.'))) if isinstance(source_address, str) else source_address
+        dest_address = bytes(map(int, dest_address.split('.'))) if isinstance(dest_address, str) else dest_address
+
+
+        # Cria o pseudo-header
+        pseudo_header = struct.pack("!4s4sHH",
+            source_address,
+            dest_address,
+            17, # UDP
+            self.length,
+        )
+
+
+        checksum = 0
+
+        # Soma os valores do pseudo-header
+        for i in range(0, len(pseudo_header), 2):
+            checksum += pseudo_header[i+1] + (pseudo_header[i] << 8) 
+
+        # Soma os valores do header UDP
+        for i in range(0, self.length - len(data), 2):
+            checksum += self.as_bytes()[i+1] + (self.as_bytes()[i] << 8)
+
+        # Soma os valores dos dados
+        if len(data) % 2:
+            data += b'\x00'
+
+        for i in range(0, len(data), 2):
+            checksum += data[i+1] + (data[i] << 8) 
+
+        # Transforma o checksum em 32 bits, adicionando leading zeros
+        checksum = (checksum & 0xFFFF) + (checksum >> 16)
+
+        # Soma os 16 bits mais significativos com os 16 bits menos significativos
+        checksum = checksum + (checksum >> 16)
+
+
+        # Faz o complemento de 1
+        checksum = ~checksum & 0xFFFF
+
+        return checksum
+        
 
 
 class IpHeader: 
