@@ -1,0 +1,9 @@
+Para iniciar o programa utilizando a conexão udp, basta entrar no diretório do projeto e executar o comando:
+python3 udp 
+Alternativamente, pode-se entrar no diretório "udp" e executar o comando:
+python3 __main__.py
+
+Para iniciar o programa utilizando o soquete raw, basta entrar no diretório do projeto e executar o comando:
+python3 raw
+Alternativamente, pode-se entrar no diretório "raw" e executar o comando:
+python3 __main__.py
